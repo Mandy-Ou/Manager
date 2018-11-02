@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,javax.servlet.http.Cookie" pageEncoding="utf-8"%>
 <%
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://"
@@ -30,6 +30,9 @@
 	});
 </script>
 
+
+
+
 </head>
 
 <body
@@ -60,7 +63,7 @@
 		<div style="text-align:center;">
 			<span style="font-size:15px;color:darkred;font-weight:bold">用户名或者密码错误</span>
 		</div>
-		<%} %>
+		<%} %>-
 		
 		<%
 			//声明java代码块进行密码修改提示语

@@ -33,4 +33,11 @@ public interface UserDao {
 	 * @return
 	 */
 	int userRegDao(User u);
+	
+	/**
+	 * 根据用户名获取用户对象
+	 * @param uname
+	 * @return
+	 */
+	User getUserByName(String uname);
 }

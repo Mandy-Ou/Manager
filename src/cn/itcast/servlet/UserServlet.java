@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +40,10 @@ public class UserServlet extends HttpServlet {
 		request.setCharacterEncoding("utf-8");
 		// 设置响应编码格式
 		response.setContentType("text/html;charset=utf-8");
+	
+		//设置三天免登录
+		freeCheckByCookie(request,response);
+		
 		// 获取操作符
 		String oper = request.getParameter("oper");
 		if ("login".equals(oper)) {
@@ -55,67 +60,69 @@ public class UserServlet extends HttpServlet {
 			userShow(request, response);
 		} else if ("register".equals(oper)) {
 			// 调用注册功能
-			userReg(request,response);
+			userReg(request, response);
 		} else {
 			logger.debug("没有找到对应的操作符：" + oper);
 		}
 	}
 
-	//用户注册功能
+	// 用户注册功能
 	private void userReg(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		//获取请求信息
+		// 获取请求信息
 		String uname = request.getParameter("uname");
 		String pwd = request.getParameter("pwd");
 		String sex = request.getParameter("sex");
-		int age = request.getParameter("age")!=""?Integer.parseInt(request.getParameter("age")):0;
+		int age = request.getParameter("age") != "" ? Integer.parseInt(request
+				.getParameter("age")) : 0;
 		String birth = request.getParameter("birth");
-//		String[] bs = null;
-//		StringBuffer sb = new StringBuffer();
-//		if(birth != ""){
-//				bs = birth.split("/");
-//				for(int i = 0 ;i <bs.length;i++){
-//					if(i<bs.length -1){
-//						sb.append(bs[i]);
-//						sb.append("-");
-//					}else{
-//						sb.append(bs[i]);
-//					}
-//				}
-//		}
-//		User u = new User(0,uname,pwd,sex,age,sb.toString());
-		
-		User u = new User(0,uname,pwd,sex,age,birth);
-		//处理请求信息
-		//调用业务层处理
+		// String[] bs = null;
+		// StringBuffer sb = new StringBuffer();
+		// if(birth != ""){
+		// bs = birth.split("/");
+		// for(int i = 0 ;i <bs.length;i++){
+		// if(i<bs.length -1){
+		// sb.append(bs[i]);
+		// sb.append("-");
+		// }else{
+		// sb.append(bs[i]);
+		// }
+		// }
+		// }
+		// User u = new User(0,uname,pwd,sex,age,sb.toString());
+
+		User u = new User(0, uname, pwd, sex, age, birth);
+		// 处理请求信息
+		// 调用业务层处理
 		int index = us.userRegService(u);
-		//返回响应结果
-		if(index > 0){
-			//获取session
+		// 返回响应结果
+		if (index > 0) {
+			// 获取session
 			HttpSession hs = request.getSession();
 			hs.setAttribute("reg", "ture");
-			//重定向
+			// 重定向
 			response.sendRedirect("login.jsp");
-		}else{
-			
+		} else {
+
 		}
 	}
 
-	//显示所有用户信息
+	// 显示所有用户信息
 	private void userShow(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		//处理请求
-			//调用service()
-			List<User> lu = us.userShowService();
-			//判断
-			if(lu != null){
-				//将查询的用户数据存储到request对象
-				request.setAttribute("lu", lu);
-				//请求转发
-				request.getRequestDispatcher("/user/showUser.jsp").forward(request,response);
-				return;
-			}
-			
+		// 处理请求
+		// 调用service()
+		List<User> lu = us.userShowService();
+		// 判断
+		if (lu != null) {
+			// 将查询的用户数据存储到request对象
+			request.setAttribute("lu", lu);
+			// 请求转发
+			request.getRequestDispatcher("/user/showUser.jsp").forward(request,
+					response);
+			return;
+		}
+
 	}
 
 	// 用户修改密码功能
@@ -127,13 +134,13 @@ public class UserServlet extends HttpServlet {
 		User u = (User) request.getSession().getAttribute("user");
 		int uid = u.getUid();
 		// 处理请求
-		//调用service处理
-		int index = us.userChangePwdService(newPwd,uid);
-		if(index >0){
-			//获取session对象
+		// 调用service处理
+		int index = us.userChangePwdService(newPwd, uid);
+		if (index > 0) {
+			// 获取session对象
 			HttpSession hs = request.getSession();
 			hs.setAttribute("pwd", "true");
-			//重定向到登陆页面（不用请求转发，是因为请求转发会分享session中的内容，但是此时用户已经修改了密码，所以用重定向）
+			// 重定向到登陆页面（不用请求转发，是因为请求转发会分享session中的内容，但是此时用户已经修改了密码，所以用重定向）
 			response.sendRedirect("/manager/login.jsp");
 		}
 
@@ -171,6 +178,17 @@ public class UserServlet extends HttpServlet {
 			HttpSession hs = request.getSession();
 			// 将用户数据存储到session中
 			hs.setAttribute("user", u);
+			
+			// 如果用户成功登陆了，就创建cookie
+			String username = request.getParameter("uname");
+			Cookie cookie = new Cookie("username", username);
+			// 设置cookie的
+			cookie.setMaxAge(3 * 24 * 3600);
+			// 设置cookie路径
+			cookie.setPath("/manager/cookie");
+			// 在响应中添加cookie
+			response.addCookie(cookie);
+			
 			// 重定向
 			response.sendRedirect("/manager/main/main.jsp");
 		} else {
@@ -186,4 +204,22 @@ public class UserServlet extends HttpServlet {
 
 	}
 
+	// 使用cookie实现三天免登录功能
+	public void freeCheckByCookie(HttpServletRequest request,
+			HttpServletResponse response) {
+		User user = null;
+		//获取cookie，检查此用户之前时候有成功登录过此管理系统
+		Cookie[] myCookies = request.getCookies();
+		for (Cookie c : myCookies) {
+			if (c.getName().equals("username")) {
+				user = us.getUserByNameService(c.getValue());
+				break;
+			}
+		}
+		if(user != null){
+			us.checkUserLoginService(user.getUname(), user.getPwd());
+		}
+		
+
+	}
 }
