@@ -57,9 +57,4 @@ public class UserServiceImpl implements UserService {
 		return ud.userRegDao(u);
 	}
 
-	@Override
-	public User getUserByNameService(String uname) {
-		return ud.getUserByName(uname);
-	}
-
 }

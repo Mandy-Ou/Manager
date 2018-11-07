@@ -33,11 +33,4 @@ public interface UserService {
 	 * @return
 	 */
 	int userRegService(User u);
-	
-	/**
-	 * 根据用户名获取用户对象
-	 * @param uname
-	 * @return
-	 */
-	User getUserByNameService(String uname);
 }

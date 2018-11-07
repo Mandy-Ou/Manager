@@ -1,4 +1,5 @@
-<%@ page language="java" import="java.util.*,javax.servlet.http.Cookie" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://"
@@ -9,30 +10,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <base href="<%=basePath%>">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>欢迎登录后台管理系统</title>
-<link href="css/style.css" rel="stylesheet" type="text/css" />
-<script language="JavaScript" src="js/jquery.js"></script>
-<script src="js/cloud.js" type="text/javascript"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>欢迎登录后台管理系统</title>
+	<link href="css/style.css" rel="stylesheet" type="text/css" />
+	<script language="JavaScript" src="js/jquery.js"></script>
+	<script src="js/cloud.js" type="text/javascript"></script>
 
-<script language="javascript">
-	$(function() {
-		$('.loginbox').css({
-			'position' : 'absolute',
-			'left' : ($(window).width() - 692) / 2
-		});
-		$(window).resize(function() {
+	<script language="javascript">
+		$(function() {
 			$('.loginbox').css({
 				'position' : 'absolute',
 				'left' : ($(window).width() - 692) / 2
 			});
-		})
-	});
-</script>
-
-
-
-
+			$(window).resize(function() {
+				$('.loginbox').css({
+					'position' : 'absolute',
+					'left' : ($(window).width() - 692) / 2
+				});
+			})
+		});
+	</script>
 </head>
 
 <body
@@ -52,44 +49,26 @@
 
 	<div class="loginbody">
 
-		<span class="systemlogo"></span>
-		<br />
-		
-		<%
-			//声明java代码块进行错误提示语逻辑校验
-			Object obj = request.getAttribute("flag");
-			if(obj != null){
-		%>
-		<div style="text-align:center;">
-			<span style="font-size:15px;color:darkred;font-weight:bold">用户名或者密码错误</span>
-		</div>
-		<%} %>-
-		
-		<%
-			//声明java代码块进行密码修改提示语
-			Object pwd = session.getAttribute("pwd");
-			if(pwd != null){
-		%>
-		<div style="text-align:center;">
-			<span style="font-size:15px;color:darkred;font-weight:bold">密码修改成功，请重新登录</span>
-		</div>
-		<%
-			}
-			session.removeAttribute("pwd"); 
-		%>
-		
-		<%
-			//声明java代码块进行注册提示语
-			Object reg = session.getAttribute("reg");
-			if(reg != null){
-		%>
-		<div style="text-align:center;">
-			<span style="font-size:15px;color:darkred;font-weight:bold">注册成功</span>
-		</div>
-		<%
-			}
-			session.removeAttribute("reg"); 
-		%>
+		<span class="systemlogo"></span> <br />
+		<!-- 使用JSTL和EL表达式完成提示语 -->
+		<c:choose>
+			<c:when test="${flag==0}">
+				<div style="text-align:center;">
+					<span style="font-size:15px;color:darkred;font-weight:bold">用户名或者密码错误</span>
+				</div>
+			</c:when>
+			<c:when test="${flag==1}">
+				<div style="text-align:center;">
+					<span style="font-size:15px;color:darkred;font-weight:bold">密码修改成功，请重新登录</span>
+				</div>
+			</c:when>
+			<c:when test="${flag==2}">
+				<div style="text-align:center;">
+					<span style="font-size:15px;color:darkred;font-weight:bold">注册成功</span>
+				</div>
+			</c:when>
+		</c:choose>
+		<c:remove var="flag" scope="session" />
 		
 
 		<div class="loginbox loginbox1">
@@ -100,13 +79,12 @@
 						class="loginuser" /></li>
 					<li><input name="pwd" placeholder="密码" type="password"
 						class="loginpwd" /></li>
-					<li class="yzm"><span>
-					<input name="" type="text"
+					<li class="yzm"><span> <input name="" type="text"
 							value="验证码" onclick="JavaScript:this.value=''" /></span><cite>X3D5S</cite>
 					</li>
 					<li><input name="" type="submit" class="loginbtn" value="登录"
-						onclick="javascript:window.location='main.html'" /><label><a href="user/reg.jsp">注册</a></label><label><a
-							href="#">忘记密码？</a></label></li>
+						onclick="javascript:window.location='main.html'" /><label><a
+							href="user/reg.jsp">注册</a></label><label><a href="#">忘记密码？</a></label></li>
 				</ul>
 			</form>
 
