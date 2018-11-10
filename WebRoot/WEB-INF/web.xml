@@ -14,5 +14,8 @@
     <servlet-name>UserServlet</servlet-name>
     <url-pattern>/user</url-pattern>
   </servlet-mapping>
+  <listener>
+  	<listener-class>cn.itcast.listener.MyListener</listener-class>
+  </listener>
 
 </web-app>

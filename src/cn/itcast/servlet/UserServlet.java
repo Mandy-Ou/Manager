@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import cn.itcast.pojo.User;
 import cn.itcast.service.UserService;
 import cn.itcast.service.impl.UserServiceImpl;
+import cn.itcast.util.JdbcUtil;
 
 /**
  * Servlet重定向路径总结: 相对路径：从当前请求的路径查找资源的路径
@@ -65,11 +66,15 @@ public class UserServlet extends HttpServlet {
 	private void userReg(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		//获取请求信息
-		String uname = request.getParameter("uname");
-		String pwd = request.getParameter("pwd");
-		String sex = request.getParameter("sex");
-		int age = request.getParameter("age")!=""?Integer.parseInt(request.getParameter("age")):0;
-		String birth = request.getParameter("birth");
+//		String uname = request.getParameter("uname");
+//		String pwd = request.getParameter("pwd");
+//		String sex = request.getParameter("sex");
+//		int age = request.getParameter("age")!=""?Integer.parseInt(request.getParameter("age")):0;
+//		String birth = request.getParameter("birth");
+		
+		//用BeanUtils简化了JavaBean
+		User u = JdbcUtil.copyToBean(request, User.class);
+		
 //		String[] bs = null;
 //		StringBuffer sb = new StringBuffer();
 //		if(birth != ""){
@@ -85,7 +90,9 @@ public class UserServlet extends HttpServlet {
 //		}
 //		User u = new User(0,uname,pwd,sex,age,sb.toString());
 		
-		User u = new User(0,uname,pwd,sex,age,birth);
+		//User u = new User(0,uname,pwd,sex,age,birth);
+		
+		
 		//处理请求信息
 		//调用业务层处理
 		int index = us.userRegService(u);
